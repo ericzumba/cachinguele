@@ -1,4 +1,4 @@
-require 'cachinguele/cache'
+require 'cachinguele/klass_and_methods'
 
 class Pedro
   def fala
@@ -13,10 +13,10 @@ class Zumba
   end
 end
 
-describe Cachinguele::Cache do
+describe Cachinguele::KlassAndMethods do
 
   it 'works' do 
-    pending
+    pending  
   end
 
 end
