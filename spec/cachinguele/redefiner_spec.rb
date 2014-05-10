@@ -6,8 +6,19 @@ describe Cachinguele::Redefiner do
       def mew 
         'meow'
       end
+
+      def walk(where_to)
+        "walking #{where_to}"
+      end
+
+      def barfs(what, where)
+       "#{what} #{where}" 
+      end
     end
+
     expect(Cat.new.mew).to eq 'meow'
+    expect(Cat.new.walk 'home').to eq 'walking home'
+    expect(Cat.new.barfs 'beer', 'on the floor').to eq 'beer on the floor'
   end
 
   describe 'how lambdas work in Ruby' do
@@ -35,31 +46,72 @@ describe Cachinguele::Redefiner do
   end 
 
   context '#redefine_method' do
-    it 'calls a given block as follows' do
-      l = lambda do |klass, method_name|
-        expect(klass).to eq Cat
-        expect(method_name).to eq :mew 
-      end
-      Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
-    end
-
-    context 'when wrap around method is empty' do
-      it 'it leaves the original implementation untouched' do
-        l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
-        Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
-        expect(Cat.new.mew).to eq 'meow'
-      end
-    end
-
-    context 'when wrap around method is really wraps around' do
-      it 'it leaves the original implementation untouched' do
-        l = lambda do |klass, method_name, original_implementation|
-          "#{original_implementation.call} very important stuff" 
+    context 'with no parameters' do
+      it 'calls a given block as follows' do
+        l = lambda do |klass, method_name|
+          expect(klass).to eq Cat
+          expect(method_name).to eq :mew 
         end
         Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
-        expect(Cat.new.mew).to eq 'meow very important stuff'
+      end
+
+      context 'when wrap around method is empty' do
+        it 'it leaves the original implementation untouched' do
+          l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
+          Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
+          expect(Cat.new.mew).to eq 'meow'
+        end
+      end
+
+      context 'when wrap around method is really wraps around' do
+        it 'it leaves the original implementation untouched' do
+          l = lambda do |klass, method_name, original_implementation|
+            "#{original_implementation.call} very important stuff" 
+          end
+          Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
+          expect(Cat.new.mew).to eq 'meow very important stuff'
+        end
+      end
+    end
+
+    context 'with one parameter' do
+      context 'when wrap around method is empty' do
+        it 'it leaves the original implementation untouched' do
+          l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
+          Cachinguele::Redefiner.redefine_method(Cat, :walk, l)
+          expect(Cat.new.walk('home')).to eq 'walking home'
+        end
+      end
+
+      context 'when wrap around method is really wraps around' do
+        it 'it leaves the original implementation untouched' do
+          l = lambda do |klass, method_name, original_implementation|
+            "#{original_implementation.call} right now" 
+          end
+          Cachinguele::Redefiner.redefine_method(Cat, :walk, l)
+          expect(Cat.new.walk('home')).to eq 'walking home right now'
+        end
+      end
+    end
+
+    context 'with n parameters' do
+      context 'when wrap around method is empty' do
+        it 'it leaves the original implementation untouched' do
+          l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
+          Cachinguele::Redefiner.redefine_method(Cat, :barfs, l)
+          expect(Cat.new.barfs('beer', 'on the floor')).to eq 'beer on the floor'
+        end
+      end
+
+      context 'when wrap around method is really wraps around' do
+        it 'it leaves the original implementation untouched' do
+          l = lambda do |klass, method_name, original_implementation|
+            "all my #{original_implementation.call}" 
+          end
+          Cachinguele::Redefiner.redefine_method(Cat, :barfs, l)
+          expect(Cat.new.barfs('beer', 'on the floor')).to eq 'all my beer on the floor'
+        end
       end
     end
   end
-
 end
