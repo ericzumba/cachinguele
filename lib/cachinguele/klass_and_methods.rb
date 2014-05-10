@@ -9,17 +9,21 @@ class Cachinguele::KlassAndMethods
   end
 
   def activate_cache
-    redefine_methods(@klass, @method_names) do |klass, original_method, &aliased_method|
-      Rails.cache.fetch("#{klass.name.underscore}:#{original_method}") do 
-        aliased_method.call
-      end
+    @method_names.each do |method_name|
+      Cachinguele::Redefiner.redefine_method(@klass, method_name, lambda do |klass, original_method, original_implementation|
+        Cachinguele::Cache.implementation.fetch("#{klass.name}:#{original_method}") do 
+          original_implementation.call
+        end
+      end)
     end
   end
 
   def activate_expiration_policies
-    redefine_methods(@klass, @method_names) do |klass, original_method, &aliased_method|
-      Rails.cache.delete("#{klass.name.underscore}:#{original_method}")
-      aliased_method.call 
+    @method_names.each do |method_name|
+      Cachinguele::Redefiner.redefine_method(@klass, method_name, lambda do |klass, original_method, original_implementation|
+        Cachinguele::Cache.implementation.delete("#{klass.name}:#{original_method}")
+        original_implementation.call 
+      end)
     end
   end
 

@@ -1,23 +1,22 @@
 require 'cachinguele'
+require 'cachinguele/caches'
 
 class Cachinguele::Cache
 
-  class Caches < Array
-    def register(klass_and_method_as_hash, expiration_policies)
-      klass_and_method_as_hash.each do |klass, method_name|
-        self << KlassAndMethods.new(klass, method_name, expiration_policies)
-      end
-    end
+  def self.implementation=(i)
+    @implementation = i
   end
 
+  def self.implementation
+    @implementation
+  end
 
-  def self.global
-    caches = Caches.new
+  def do_it
+    caches = Cachinguele::Caches.new
     yield(caches) # register all cache for all methods
     caches.each do |cache|
       cache.activate_cache 
-      cache.activate_expiration_policies
+      # cache.activate_expiration_policies
     end
   end
-
 end
