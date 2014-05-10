@@ -43,11 +43,21 @@ describe Cachinguele::Redefiner do
       Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
     end
 
-    context 'when original implementation needs to be left alone' do
+    context 'when wrap around method is empty' do
       it 'it leaves the original implementation untouched' do
-        l = lambda { |klass, method_name| } 
+        l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
         Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
         expect(Cat.new.mew).to eq 'meow'
+      end
+    end
+
+    context 'when wrap around method is really wraps around' do
+      it 'it leaves the original implementation untouched' do
+        l = lambda do |klass, method_name, original_implementation|
+          "#{original_implementation.call} very important stuff" 
+        end
+        Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
+        expect(Cat.new.mew).to eq 'meow very important stuff'
       end
     end
   end

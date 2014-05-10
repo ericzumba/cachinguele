@@ -8,8 +8,9 @@ class Cachinguele::Redefiner
     klass.class_eval do
       alias_method "#{REDEFINER_PREFIX}_#{method_name}".to_sym, method_name 
       define_method method_name do
-        wrap_around.call(klass, method_name)
-        send("#{REDEFINER_PREFIX}_#{method_name}".to_sym)
+        wrap_around.call(klass, method_name, lambda do
+          send("#{REDEFINER_PREFIX}_#{method_name}".to_sym)
+        end)
       end
     end
   end
