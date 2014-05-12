@@ -1,7 +1,7 @@
 require 'cachinguele'
 require 'cachinguele/caches'
 
-class Cachinguele::Cache
+class Cachinguele::Register
 
   def self.implementation=(i)
     @implementation = i

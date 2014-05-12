@@ -1,6 +1,6 @@
-require 'cachinguele/cache'
+require 'cachinguele/register'
 
-describe Cachinguele::Cache do
+describe Cachinguele::Register do
   before :all do
     class FakeCacheImplementation
       def initialize(cache = {})
@@ -23,7 +23,6 @@ describe Cachinguele::Cache do
   end
 
   before :each do
-
     class Dog 
       attr_writer :how_to_bark
       def initialize(how_to_bark)
@@ -33,7 +32,6 @@ describe Cachinguele::Cache do
       def bark 
         @how_to_bark
       end
-
     end
     
     class DogsFriend
@@ -43,14 +41,14 @@ describe Cachinguele::Cache do
     end
 
     expect(Dog.new('woof').bark).to eq 'woof'
-    Cachinguele::Cache.implementation = FakeCacheImplementation.new {}
+    Cachinguele::Register.implementation = FakeCacheImplementation.new {}
   end
 
   it 'fake cache implementation works' do
-    Cachinguele::Cache.implementation.fetch('wow') { 'WOOOW' }
-    expect(Cachinguele::Cache.implementation.fetch('wow') {'bummer'}).to eql 'WOOOW'
-    Cachinguele::Cache.implementation.delete('wow')
-    expect(Cachinguele::Cache.implementation.fetch('wow') {'YAY'}).to eql 'YAY'
+    Cachinguele::Register.implementation.fetch('wow') { 'WOOOW' }
+    expect(Cachinguele::Register.implementation.fetch('wow') {'bummer'}).to eql 'WOOOW'
+    Cachinguele::Register.implementation.delete('wow')
+    expect(Cachinguele::Register.implementation.fetch('wow') {'YAY'}).to eql 'YAY'
   end
 
   context 'when applied to a single object instance' do
