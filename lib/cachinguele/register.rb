@@ -13,9 +13,9 @@ class Cachinguele::Register
 
   def do_it
     caches = Cachinguele::Caches.new
-    yield(caches) # register all cache for all methods
+    yield(caches) # register cache for all methods
     caches.each do |cache|
-      cache.activate_cache 
+      cache.activate 
       # cache.activate_expiration_policies
     end
   end

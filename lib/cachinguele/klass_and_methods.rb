@@ -1,34 +1,21 @@
 require 'cachinguele'
 
 class Cachinguele::KlassAndMethods 
-  attr_reader :klass, :method_name
-  def initialize(klass, method_names, expiration_policies)
+  attr_reader :klass, :method_names
+  def initialize(klass, method_names)
     @klass                = klass
     @method_names         = method_names
-    @expiration_policies  = expiration_policies
   end
 
-  def activate_cache
-    @method_names.each do |method_name|
-      Cachinguele::Redefiner.redefine_method(@klass, method_name, lambda do |klass, original_method, original_implementation|
-        Cachinguele::Register.implementation.fetch(build_key klass.name, original_method) do 
-          original_implementation.call
-        end
-      end)
-    end
-  end
-
-  def activate_expiration_policies
-    @method_names.each do |method_name|
-      Cachinguele::Redefiner.redefine_method(@klass, method_name, lambda do |klass, original_method, original_implementation|
-        Cachinguele::Register.implementation.delete(build_key klass.name, original_method)
-        original_implementation.call 
-      end)
+  def apply_to_each_method
+    @method_names.each do |method_name| 
+      yield klass, method_name, build_key(method_name)
     end
   end
  
   private
-  def build_key(klass_name, method_name)
+
+  def build_key(method_name)
     "#{klass.name}:#{method_name}"
   end
 
