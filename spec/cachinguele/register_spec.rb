@@ -23,6 +23,12 @@ describe Cachinguele::Register do
   end
 
   before :each do
+
+    # resets Dog class for tests
+    if defined? Object::Dog
+      Object.send(:remove_const, :Dog)
+    end
+
     class Dog 
       attr_writer :how_to_bark
       def initialize(how_to_bark)
@@ -32,6 +38,10 @@ describe Cachinguele::Register do
       def bark 
         @how_to_bark
       end
+    end
+
+    if defined? Object::DogsFriend
+      Object.send(:remove_const, :DogsFriend)
     end
     
     class DogsFriend
@@ -83,10 +93,21 @@ describe Cachinguele::Register do
       subject.do_it do |cache|
         cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently] })
       end
-      bonita = Dog.new('woof')
-      expect(bonita.bark).to eq 'woof' 
-      bonito = Dog.new('arf arf')
-      expect(bonito.bark).to eq 'woof' 
+
+      expect(Dog.new('woof').bark).to eq 'woof' 
+      expect(Dog.new('arf arf').bark).to eq 'woof' 
+    end
+   
+    context "one of the expiration policy's methods is called" do 
+      it 'restores a cached method behaviour' do 
+        subject.do_it do |cache|
+          cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently] })
+        end
+
+        expect(Dog.new('woof').bark).to eq 'woof' 
+        DogsFriend.new.tells_her_differently
+        expect(Dog.new('arf arf').bark).to eq 'arf arf'
+      end
     end
   end
 

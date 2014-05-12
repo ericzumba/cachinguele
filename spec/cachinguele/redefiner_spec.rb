@@ -2,6 +2,12 @@ require 'cachinguele/redefiner'
 
 describe Cachinguele::Redefiner do
   before :each do
+
+    # resets Cat class for tests
+    if defined? Object::Cat
+      Object.send(:remove_const, :Cat)
+    end
+
     class Cat 
       def mew 
         'meow'
@@ -41,7 +47,7 @@ describe Cachinguele::Redefiner do
       expect(Cat.new.mew).to eq 'meow'
     end
 
-    it 'does NOT work with a pure lambda ' do
+    it 'does NOT work with a lambda called from within a block' do
       l = lambda {send(:redefined_mew)}
       Cat.class_eval do
         alias_method :redefined_mew, :mew
