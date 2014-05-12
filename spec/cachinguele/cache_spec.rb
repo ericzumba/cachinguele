@@ -23,7 +23,9 @@ describe Cachinguele::Cache do
   end
 
   before :each do
+
     class Dog 
+      attr_writer :how_to_bark
       def initialize(how_to_bark)
         @how_to_bark = how_to_bark
       end
@@ -31,6 +33,7 @@ describe Cachinguele::Cache do
       def bark 
         @how_to_bark
       end
+
     end
     
     class DogsFriend
@@ -43,18 +46,37 @@ describe Cachinguele::Cache do
     Cachinguele::Cache.implementation = FakeCacheImplementation.new {}
   end
 
-  it 'FakeCacheImplementation works' do
+  it 'fake cache implementation works' do
     Cachinguele::Cache.implementation.fetch('wow') { 'WOOOW' }
     expect(Cachinguele::Cache.implementation.fetch('wow') {'bummer'}).to eql 'WOOOW'
     Cachinguele::Cache.implementation.delete('wow')
     expect(Cachinguele::Cache.implementation.fetch('wow') {'YAY'}).to eql 'YAY'
   end
 
-  it 'works' do 
-    subject.do_it do |cache|
-      cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently] })
+  context 'when applied to a single object instance' do
+    it 'overrides a method behaviour with its latest cache' do 
+      subject.do_it do |cache|
+        cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently] })
+      end
+      bonita = Dog.new('woof')
+      expect(bonita.bark).to eq 'woof' 
+      bonita.how_to_bark = 'arf arf'
+      expect(bonita.bark).to eq 'woof'
+
+      expect(Dog.new('arf arf').bark).to eq 'woof' 
     end
-    expect(Dog.new('woof').bark).to eq 'woof' 
+  end
+
+  context 'when applied to a another object instance of the same class' do
+    it 'overrides a method behaviour with its latest cache' do 
+      subject.do_it do |cache|
+        cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently] })
+      end
+      bonita = Dog.new('woof')
+      expect(bonita.bark).to eq 'woof' 
+      bonito = Dog.new('arf arf')
+      expect(bonito.bark).to eq 'woof' 
+    end
   end
 
 end

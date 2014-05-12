@@ -11,7 +11,7 @@ class Cachinguele::KlassAndMethods
   def activate_cache
     @method_names.each do |method_name|
       Cachinguele::Redefiner.redefine_method(@klass, method_name, lambda do |klass, original_method, original_implementation|
-        Cachinguele::Cache.implementation.fetch("#{klass.name}:#{original_method}") do 
+        Cachinguele::Cache.implementation.fetch(build_key klass.name, original_method) do 
           original_implementation.call
         end
       end)
@@ -21,10 +21,15 @@ class Cachinguele::KlassAndMethods
   def activate_expiration_policies
     @method_names.each do |method_name|
       Cachinguele::Redefiner.redefine_method(@klass, method_name, lambda do |klass, original_method, original_implementation|
-        Cachinguele::Cache.implementation.delete("#{klass.name}:#{original_method}")
+        Cachinguele::Cache.implementation.delete(build_key klass.name, original_method)
         original_implementation.call 
       end)
     end
+  end
+ 
+  private
+  def build_key(klass_name, method_name)
+    "#{klass.name}:#{method_name}"
   end
 
 end
