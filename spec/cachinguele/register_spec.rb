@@ -48,7 +48,7 @@ describe Cachinguele::Register do
     Cachinguele::Register.implementation.fetch('wow') { 'WOOOW' }
     expect(Cachinguele::Register.implementation.fetch('wow') {'bummer'}).to eql 'WOOOW'
     Cachinguele::Register.implementation.delete('wow')
-    expect(Cachinguele::Register.implementation.fetch('wow') {'YAY'}).to eql 'YAY'
+    expect(Cachinguele::Register.implementation.fetch('wow') { 'YAY' }).to eql 'YAY'
   end
 
   context 'when applied to a single object instance' do
@@ -60,8 +60,21 @@ describe Cachinguele::Register do
       expect(bonita.bark).to eq 'woof' 
       bonita.how_to_bark = 'arf arf'
       expect(bonita.bark).to eq 'woof'
+    end
 
-      expect(Dog.new('arf arf').bark).to eq 'woof' 
+    context "one of the expiration policy's methods is called" do 
+      it 'restores a cached method behaviour' do 
+        subject.do_it do |cache|
+          cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently] })
+        end
+        bonita = Dog.new('woof')
+        expect(bonita.bark).to eq 'woof' 
+        bonita.how_to_bark = 'arf arf'
+        expect(bonita.bark).to eq 'woof'
+
+        DogsFriend.new.tells_her_differently
+        expect(bonita.bark).to eq 'arf arf'
+      end
     end
   end
 

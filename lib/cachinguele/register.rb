@@ -16,7 +16,6 @@ class Cachinguele::Register
     yield(caches) # register cache for all methods
     caches.each do |cache|
       cache.activate 
-      # cache.activate_expiration_policies
     end
   end
 end

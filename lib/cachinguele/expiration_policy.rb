@@ -6,10 +6,10 @@ class Cachinguele::ExpirationPolicy
     @klass_and_methods = klass_and_methods
   end
 
-  def activate
+  def activate_for(cache)
     @klass_and_methods.apply_to_each_method do |klass, method_name, key|
       Cachinguele::Redefiner.redefine_method(klass, method_name, lambda do |klass, original_method, original_implementation|
-        Cachinguele::Register.implementation.delete(key)
+        cache.expire_all_methods
         original_implementation.call 
       end)
     end
