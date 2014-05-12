@@ -46,8 +46,11 @@ describe Cachinguele::Register do
     
     class DogsFriend
       def tells_her_differently
-
       end
+
+      def criticizes_it
+      end 
+
     end
 
     expect(Dog.new('woof').bark).to eq 'woof'
@@ -85,6 +88,20 @@ describe Cachinguele::Register do
         DogsFriend.new.tells_her_differently
         expect(bonita.bark).to eq 'arf arf'
       end
+
+      it 'restores a cached method behaviour' do 
+        subject.do_it do |cache|
+          cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently, :criticizes_it] })
+        end
+        bonita = Dog.new('woof')
+        expect(bonita.bark).to eq 'woof' 
+        bonita.how_to_bark = 'arf arf'
+        expect(bonita.bark).to eq 'woof'
+
+        DogsFriend.new.criticizes_it
+        expect(bonita.bark).to eq 'arf arf'
+      end
+
     end
   end
 
@@ -105,7 +122,19 @@ describe Cachinguele::Register do
         end
 
         expect(Dog.new('woof').bark).to eq 'woof' 
+        expect(Dog.new('arf arf').bark).to eq 'woof'
         DogsFriend.new.tells_her_differently
+        expect(Dog.new('arf arf').bark).to eq 'arf arf'
+      end
+
+      it 'restores a cached method behaviour' do 
+        subject.do_it do |cache|
+          cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently, :criticizes_it] })
+        end
+
+        expect(Dog.new('woof').bark).to eq 'woof' 
+        expect(Dog.new('arf arf').bark).to eq 'woof'
+        DogsFriend.new.criticizes_it
         expect(Dog.new('arf arf').bark).to eq 'arf arf'
       end
     end
