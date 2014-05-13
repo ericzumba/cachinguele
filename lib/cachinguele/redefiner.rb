@@ -9,9 +9,16 @@ class Cachinguele::Redefiner
     klass.class_eval do
     alias_method "#{prefix}_#{method_name}".to_sym, method_name 
       define_method method_name do |*args, &block|
-        wrap_around.call(klass, method_name, lambda do
+
+        original_implementation = lambda do
           send("#{prefix}_#{method_name}".to_sym, *args, &block)
-        end)
+        end
+
+        scope = lambda do
+          self 
+        end
+
+        wrap_around.call(klass, method_name, original_implementation, scope)
       end
     end
   end

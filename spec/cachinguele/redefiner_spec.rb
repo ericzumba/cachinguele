@@ -72,7 +72,7 @@ describe Cachinguele::Redefiner do
 
       context 'when wrap around method is empty' do
         it 'it leaves the original implementation untouched' do
-          l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
+          l = lambda { |klass, method_name, original_implementation, scope| original_implementation.call } 
           Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
           expect(Cat.new.mew).to eq 'meow'
         end
@@ -80,7 +80,7 @@ describe Cachinguele::Redefiner do
 
       context 'when wrap around method is really wraps around' do
         it 'it leaves the original implementation untouched' do
-          l = lambda do |klass, method_name, original_implementation|
+          l = lambda do |klass, method_name, original_implementation, scope|
             "#{original_implementation.call} very important stuff" 
           end
           Cachinguele::Redefiner.redefine_method(Cat, :mew, l)
@@ -92,7 +92,7 @@ describe Cachinguele::Redefiner do
     context 'with one parameter' do
       context 'when wrap around method is empty' do
         it 'it leaves the original implementation untouched' do
-          l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
+          l = lambda { |klass, method_name, original_implementation, scope| original_implementation.call } 
           Cachinguele::Redefiner.redefine_method(Cat, :walk, l)
           expect(Cat.new.walk('home')).to eq 'walking home'
         end
@@ -100,7 +100,7 @@ describe Cachinguele::Redefiner do
 
       context 'when wrap around method is really wraps around' do
         it 'it leaves the original implementation untouched' do
-          l = lambda do |klass, method_name, original_implementation|
+          l = lambda do |klass, method_name, original_implementation, scope|
             "#{original_implementation.call} right now" 
           end
           Cachinguele::Redefiner.redefine_method(Cat, :walk, l)
@@ -112,7 +112,7 @@ describe Cachinguele::Redefiner do
     context 'with n parameters' do
       context 'when wrap around method is empty' do
         it 'it leaves the original implementation untouched' do
-          l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
+          l = lambda { |klass, method_name, original_implementation, scope| original_implementation.call } 
           Cachinguele::Redefiner.redefine_method(Cat, :barfs, l)
           expect(Cat.new.barfs('beer', 'on the floor')).to eq 'beer on the floor'
         end
@@ -120,7 +120,7 @@ describe Cachinguele::Redefiner do
 
       context 'when wrap around method is really wraps around' do
         it 'it leaves the original implementation untouched' do
-          l = lambda do |klass, method_name, original_implementation|
+          l = lambda do |klass, method_name, original_implementation, scope|
             "all my #{original_implementation.call}" 
           end
           Cachinguele::Redefiner.redefine_method(Cat, :barfs, l)
@@ -133,7 +133,7 @@ describe Cachinguele::Redefiner do
         context 'and given' do
           context 'when wrap around method is empty' do
             it 'it leaves the original implementation untouched' do
-              l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
+              l = lambda { |klass, method_name, original_implementation, scope| original_implementation.call } 
               Cachinguele::Redefiner.redefine_method(Cat, :complicated_barfs, l)
               expect(Cat.new.complicated_barfs('beer', 'on the floor') {|what| "old #{what}"}).to eq 'old beer on the floor'
             end
@@ -141,7 +141,7 @@ describe Cachinguele::Redefiner do
 
           context 'when wrap around method is really wraps around' do
             it 'it leaves the original implementation untouched ' do
-              l = lambda do |klass, method_name, original_implementation|
+              l = lambda do |klass, method_name, original_implementation, scope|
                 "all my #{original_implementation.call}" 
               end
               Cachinguele::Redefiner.redefine_method(Cat, :complicated_barfs, l)
@@ -153,7 +153,7 @@ describe Cachinguele::Redefiner do
         context 'and NOT given' do
           context 'when wrap around method is empty' do
             it 'it leaves the original implementation untouched' do
-              l = lambda { |klass, method_name, original_implementation| original_implementation.call } 
+              l = lambda { |klass, method_name, original_implementation, scope| original_implementation.call } 
               Cachinguele::Redefiner.redefine_method(Cat, :complicated_barfs, l)
               expect(Cat.new.complicated_barfs('beer', 'on the floor')).to eq "i think i'm allright" 
             end
@@ -161,7 +161,7 @@ describe Cachinguele::Redefiner do
 
           context 'when wrap around method is really wraps around' do
             it 'it leaves the original implementation untouched ' do
-              l = lambda do |klass, method_name, original_implementation|
+              l = lambda do |klass, method_name, original_implementation, scope|
                 "after all #{original_implementation.call}" 
               end
               Cachinguele::Redefiner.redefine_method(Cat, :complicated_barfs, l)
