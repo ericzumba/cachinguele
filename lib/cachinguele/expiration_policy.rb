@@ -1,4 +1,5 @@
 require 'cachinguele'
+require 'cachinguele/redefiner'
 
 class Cachinguele::ExpirationPolicy
 
