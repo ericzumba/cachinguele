@@ -19,7 +19,6 @@ describe Cachinguele::Register do
         @cache.delete(key) 
       end
     end
-
   end
 
   before :each do
@@ -30,13 +29,9 @@ describe Cachinguele::Register do
     end
 
     class Dog 
-      attr_writer :how_to_bark
-      def initialize(how_to_bark)
-        @how_to_bark = how_to_bark
-      end
-
-      def bark 
-        @how_to_bark
+      attr_accessor :bark, :howl
+      def initialize(how_to_bark = 'woof', how_to_howl = 'aaw aaaaaw')
+        @bark, @howl = how_to_bark, how_to_howl
       end
     end
 
@@ -50,7 +45,6 @@ describe Cachinguele::Register do
 
       def criticizes_it
       end 
-
     end
 
     expect(Dog.new('woof').bark).to eq 'woof'
@@ -71,35 +65,57 @@ describe Cachinguele::Register do
       end
       bonita = Dog.new('woof')
       expect(bonita.bark).to eq 'woof' 
-      bonita.how_to_bark = 'arf arf'
+      bonita.bark = 'arf arf'
       expect(bonita.bark).to eq 'woof'
+    end
+
+    it 'overrides all method behaviours with their latest caches' do 
+      subject.do_it do |cache|
+        cache.register({ Dog => [:bark, :howl] }, { DogsFriend =>  [:tells_her_differently] })
+      end
+      bonita = Dog.new('woof')
+      expect(bonita.bark).to eq 'woof' 
+      bonita.bark = 'arf arf'
+      expect(bonita.bark).to eq 'woof'
+      bonita.howl = 'aaw aaaaaw'
+      expect(bonita.howl).to eq 'aaw aaaaaw'
+      bonita.howl = 'eew eeeeew'
+      expect(bonita.howl).to eq 'aaw aaaaaw'
     end
 
     context "one of the expiration policy's methods is called" do 
       it 'restores a cached method behaviour' do 
         subject.do_it do |cache|
-          cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently] })
+          cache.register({ Dog => [:bark, :howl] }, { DogsFriend =>  [:tells_her_differently] })
         end
-        bonita = Dog.new('woof')
+        bonita = Dog.new('woof', 'aaw aaaaaw')
         expect(bonita.bark).to eq 'woof' 
-        bonita.how_to_bark = 'arf arf'
+        expect(bonita.howl).to eq 'aaw aaaaaw' 
+        bonita.bark = 'arf arf'
         expect(bonita.bark).to eq 'woof'
+        bonita.howl = 'eew eeeeew'
+        expect(bonita.howl).to eq 'aaw aaaaaw' 
 
         DogsFriend.new.tells_her_differently
         expect(bonita.bark).to eq 'arf arf'
+        expect(bonita.howl).to eq 'eew eeeeew' 
       end
 
       it 'restores a cached method behaviour' do 
         subject.do_it do |cache|
-          cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently, :criticizes_it] })
+          cache.register({ Dog => [:bark, :howl] }, { DogsFriend =>  [:tells_her_differently, :criticizes_it] })
         end
-        bonita = Dog.new('woof')
+        bonita = Dog.new('woof', 'aaw aaaaaw')
         expect(bonita.bark).to eq 'woof' 
-        bonita.how_to_bark = 'arf arf'
+        expect(bonita.howl).to eq 'aaw aaaaaw' 
+        bonita.bark = 'arf arf'
         expect(bonita.bark).to eq 'woof'
+        bonita.howl = 'eew eeeeew'
+        expect(bonita.howl).to eq 'aaw aaaaaw' 
 
         DogsFriend.new.criticizes_it
         expect(bonita.bark).to eq 'arf arf'
+        expect(bonita.howl).to eq 'eew eeeeew' 
       end
 
     end
@@ -118,24 +134,30 @@ describe Cachinguele::Register do
     context "one of the expiration policy's methods is called" do 
       it 'restores a cached method behaviour' do 
         subject.do_it do |cache|
-          cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently] })
+          cache.register({ Dog => [:bark, :howl] }, { DogsFriend =>  [:tells_her_differently] })
         end
 
         expect(Dog.new('woof').bark).to eq 'woof' 
         expect(Dog.new('arf arf').bark).to eq 'woof'
+        expect(Dog.new('woof', 'aw aaw').howl).to eq 'aw aaw' 
+        expect(Dog.new('woof', 'ew eew').howl).to eq 'aw aaw'
         DogsFriend.new.tells_her_differently
         expect(Dog.new('arf arf').bark).to eq 'arf arf'
+        expect(Dog.new('arf arf', 'ew eew').howl).to eq 'ew eew'
       end
 
       it 'restores a cached method behaviour' do 
         subject.do_it do |cache|
-          cache.register({ Dog => [:bark] }, { DogsFriend =>  [:tells_her_differently, :criticizes_it] })
+          cache.register({ Dog => [:bark, :howl] }, { DogsFriend =>  [:tells_her_differently, :criticizes_it] })
         end
 
         expect(Dog.new('woof').bark).to eq 'woof' 
         expect(Dog.new('arf arf').bark).to eq 'woof'
+        expect(Dog.new('woof', 'aw aaw').howl).to eq 'aw aaw' 
+        expect(Dog.new('woof', 'ew eew').howl).to eq 'aw aaw'
         DogsFriend.new.criticizes_it
         expect(Dog.new('arf arf').bark).to eq 'arf arf'
+        expect(Dog.new('arf arf', 'ew eew').howl).to eq 'ew eew'
       end
     end
   end
