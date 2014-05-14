@@ -1,3 +1,5 @@
+![alt text](logo.jpg)
+
 # Cachinguele
 
 TODO: Write a gem description
