@@ -1,4 +1,4 @@
-![alt text](https://gitlab.ir7.com.br/cms/cachinguele/blob/master/logo.jpg)
+![alt text](https://gitlab.ir7.com.br/cms/cachinguele/raw/master/logo.jpg)
 
 # Cachinguele
 
