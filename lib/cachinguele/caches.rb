@@ -4,9 +4,14 @@ require 'cachinguele/expiration_policy'
 require 'cachinguele/klass_and_methods'
 
 class Cachinguele::Caches < Array
-  def register(cached_methods_as_hash, expiration_policies_as_hash)
-    cached_methods_as_hash.each do |klass, method_name|
-      self << Cachinguele::Cache.new(Cachinguele::KlassAndMethods.new(klass, method_name), expiration_policies_as_hash)
+
+  def initialize(cache_implementation)
+    @cache_implementation = cache_implementation
+  end
+
+  def register(caches, expiration_policies)
+    caches.each do |klass, methods_and_scope|
+      self << Cachinguele::Cache.new(Cachinguele::KlassAndMethods.new(klass, methods_and_scope), expiration_policies, @cache_implementation)
     end
   end
 end

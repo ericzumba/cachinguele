@@ -2,18 +2,14 @@ require 'cachinguele'
 require 'cachinguele/caches'
 
 class Cachinguele::Register
-
-  def self.implementation=(i)
-    @implementation = i
-  end
-
-  def self.implementation
-    @implementation
+  attr_reader :implementation
+  def initialize(cache_implementation)
+    @implementation = cache_implementation
   end
 
   def do_it
-    caches = Cachinguele::Caches.new
-    yield(caches) # register cache for all methods
+    caches = Cachinguele::Caches.new(@implementation)
+    yield(caches) 
     caches.each do |cache|
       cache.activate 
     end
