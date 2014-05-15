@@ -1,3 +1,5 @@
+![alt text](https://gitlab.ir7.com.br/cms/cachinguele/raw/master/logo.jpg)
+
 # Cachinguele
 
 TODO: Write a gem description
